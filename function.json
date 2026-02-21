@@ -1,0 +1,155 @@
+{
+  "type": "scalar.function",
+  "input_schema": {
+    "type": "object",
+    "description": "A photograph of a cat to evaluate for background clarity — the degree to which the background and surrounding space recede to let the cat command the viewer's attention rather than competing with it.",
+    "properties": {
+      "cat_photo": {
+        "type": "image",
+        "description": "A photograph in which a cat is the intended subject. The image may depict any setting — a studio backdrop, a sunlit windowsill, a cluttered kitchen counter, a garden, or a city sidewalk. The function examines the entire frame as a system of visual relationships, with the cat as the anchor, evaluating the background across three qualities: visual stillness (freedom from clutter, busy patterns, visible text, and competing objects), tonal harmony (whether colors, brightness, and contrast complement rather than overwhelm the cat), and compositional deference (whether the spatial arrangement of background elements directs the viewer's eye toward the cat rather than away from it)."
+      }
+    },
+    "required": [
+      "cat_photo"
+    ]
+  },
+  "tasks": [
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "I'm selecting cat photographs for a curated gallery. For each photo, I need you to focus specifically on the background — the space behind and around the cat. Ignore the cat itself and examine only what surrounds it. Here is the photograph:"
+            },
+            {
+              "$jmespath": "input.cat_photo"
+            },
+            {
+              "type": "text",
+              "text": "Describe the background of this cat photograph. Is it visually quiet and free from distractions — settling into a calm texture that stays out of the way — or is it busy and cluttered with attention-grabbing elements like scattered objects, busy patterns, visible text, or bright saturated patches that pull the eye away from the cat?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The background is visually quiet and settled. There are no competing elements demanding attention — no clutter, no busy patterns, no visible text or bright objects pulling the eye away. The space behind the cat blends into a calm, cohesive texture that stays completely out of the way. The cat is easily the most prominent thing in the frame."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The background is somewhat busy. There are a few distracting elements — perhaps some visible objects, a touch of clutter, or a pattern that catches the eye — but they don't completely overwhelm the cat. The background has some visual noise, though the cat still manages to hold its ground as the subject."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The background is noisy and cluttered. There are many attention-grabbing elements competing with the cat — scattered objects, busy patterns, visible text, bright or saturated patches, or other distractions that pull the eye in multiple directions. The space behind the cat hums with competing signals and fragments the viewer's attention away from the subject."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output[\"scores\"][0] * 1.0 + output[\"scores\"][1] * 0.5"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "developer",
+          "content": [
+            {
+              "type": "text",
+              "text": "You are a professional photographer evaluating the color and tonal relationships in cat photographs. Focus on how the background's colors, brightness, and contrast interact with the cat subject. Also note if any other animals, people, or partial figures are visible in the frame, as these compete with the primary subject."
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "$jmespath": "input.cat_photo"
+            },
+            {
+              "type": "text",
+              "text": "Look at the colors, brightness, and contrast in the background of this cat photograph. Do the tones complement the cat — supporting it with a harmonious palette — or do they clash and compete with the subject?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The background tones complement the cat beautifully. The colors are soft and muted, sitting comfortably behind the subject without any jarring contrasts or competing saturated patches. The cat maintains clear visual separation and primacy — the palette feels harmonious and supportive, with no other animals or figures competing for attention in the frame."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The tonal relationship is mixed. Some colors in the background work reasonably well with the cat, but there are areas where brightness or saturation creates mild competition — perhaps a slightly hot spot, a patch of color that doesn't quite relate to the cat's fur, or a partial figure at the edge of the frame. The cat is still distinguishable as the subject, but the tones don't fully defer to it."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The background tones clash with the cat. There are harsh contrasts, overly bright or saturated colors that overpower the subject, or the background washes out the cat's edges and dissolves the boundary between figure and ground. The tonal character of the surrounding space competes aggressively with the cat, or other animals and figures visible in the frame fracture the sense of a single clear subject."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output[\"scores\"][0] * 1.0 + output[\"scores\"][1] * 0.5"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "I want to understand how this cat photograph directs the viewer's eye. Look at the full composition — the arrangement of everything in the frame, any leading lines, depth-of-field effects, framing elements, and the placement of bright or prominent areas. Then tell me: does the composition guide your eye to the cat and keep it there, or does it pull your attention elsewhere?"
+            },
+            {
+              "$jmespath": "input.cat_photo"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The composition guides my eye directly to the cat and holds it there. The background defers to the subject completely — whether through depth-of-field blur that softens everything behind the cat, natural framing elements that enclose it, or leading lines that funnel attention inward, the spatial arrangement works entirely in the cat's favor. The background has enough structure to feel intentional but none of it rivals the subject. My gaze settles on the cat without resistance."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The composition partially supports the cat, but my eye wanders. There are some elements that guide attention toward the subject, but also competing lines, bright areas near the edges, or background structures that occasionally pull my gaze to the periphery. The background doesn't fully work against the cat, but it hasn't organized itself entirely in the cat's favor either — my attention drifts before returning."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The composition pulls my attention away from the cat. Strong lines lead off the edges of the frame, bright windows or light sources positioned away from the cat draw my eye to the periphery, or the background elements have assembled their own visual structure that competes with the cat for dominance. The spatial arrangement works against the subject rather than for it — my gaze struggles to settle on the cat and is drawn elsewhere."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output[\"scores\"][0] * 1.0 + output[\"scores\"][1] * 0.5"
+      }
+    }
+  ],
+  "description": "Scores how cleanly a cat photograph's background recedes to let the cat command attention. Evaluates visual stillness, tonal harmony, and compositional deference — penalizing clutter, competing colors, visible text, partial figures, and attention-grabbing elements that rival the subject."
+}
